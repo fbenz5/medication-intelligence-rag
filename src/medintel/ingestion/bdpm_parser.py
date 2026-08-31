@@ -2,7 +2,9 @@ import csv
 from datetime import date, datetime
 from pathlib import Path
 
+from medintel.ingestion.models import IngestionError, IngestionResult
 from medintel.models.medication import Medication
+
 
 EXPECTED_FIELD_COUNT = 12
 DATE_FORMAT = "%d/%m/%Y"
@@ -39,8 +41,9 @@ def parse_medication_row(row: list[str]) -> Medication:
     )
 
 
-def parse_bdpm_file(file_path: Path) -> list[Medication]:
+def parse_bdpm_file(file_path: Path) -> IngestionResult:
     medications: list[Medication] = []
+    errors: list[IngestionError] = []
 
     with file_path.open(
         "r",
@@ -53,8 +56,19 @@ def parse_bdpm_file(file_path: Path) -> list[Medication]:
             try:
                 medications.append(parse_medication_row(row))
             except (ValueError, TypeError) as error:
-                raise ValueError(
-                    f"Failed to parse BDPM row {row_number}: {error}"
-                ) from error
+                errors.append(
+                    IngestionError(
+                        row_number=row_number,
+                        error=str(error),
+                    )
+                )
 
-    return medications
+    total_rows = len(medications) + len(errors)
+
+    return IngestionResult(
+        medications=medications,
+        total_rows=total_rows,
+        successful_rows=len(medications),
+        failed_rows=len(errors),
+        errors=errors,
+    )
