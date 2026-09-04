@@ -5,7 +5,6 @@ from pathlib import Path
 from medintel.ingestion.models import IngestionError, IngestionResult
 from medintel.models.medication import Medication
 
-
 EXPECTED_FIELD_COUNT = 12
 DATE_FORMAT = "%d/%m/%Y"
 
@@ -66,7 +65,7 @@ def parse_bdpm_file(file_path: Path) -> IngestionResult:
     total_rows = len(medications) + len(errors)
 
     return IngestionResult(
-        medications=medications,
+        items=medications,
         total_rows=total_rows,
         successful_rows=len(medications),
         failed_rows=len(errors),

@@ -2,7 +2,6 @@ from pathlib import Path
 
 from medintel.ingestion.bdpm_parser import parse_bdpm_file
 
-
 FILE_PATH = Path("data/raw/CIS_bdpm.txt")
 
 
@@ -19,7 +18,7 @@ def main() -> None:
             print(f"  Row {error.row_number}: {error.error}")
 
     print("\nFirst 5 medications:")
-    for medication in result.medications[:5]:
+    for medication in result.items[:5]:
         print(medication)
 
 

@@ -1,6 +1,8 @@
+from typing import TypeVar
+
 from pydantic import BaseModel
 
-from medintel.models.medication import Medication
+T = TypeVar("T")
 
 
 class IngestionError(BaseModel):
@@ -8,8 +10,8 @@ class IngestionError(BaseModel):
     error: str
 
 
-class IngestionResult(BaseModel):
-    medications: list[Medication]
+class IngestionResult[T](BaseModel):
+    items: list[T]
     total_rows: int
     successful_rows: int
     failed_rows: int
