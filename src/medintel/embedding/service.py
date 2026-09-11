@@ -1,6 +1,5 @@
 from langchain_huggingface import HuggingFaceEmbeddings
 
-
 MODEL_NAME = "BAAI/bge-m3"
 
 

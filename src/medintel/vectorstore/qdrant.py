@@ -3,7 +3,6 @@ from qdrant_client.models import PointStruct
 
 from medintel.models.chunk import Chunk
 
-
 QDRANT_URL = "http://localhost:6333"
 COLLECTION_NAME = "medication_documents"
 

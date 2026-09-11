@@ -4,7 +4,6 @@ from medintel.embedding.service import EmbeddingService
 from medintel.ingestion.langchain_chunker import chunk_document_with_langchain
 from medintel.ingestion.pdf_parser import parse_pdf_file
 
-
 FILE_PATH = Path("data/documents/has/bon_usage_antiemetiques.pdf")
 
 

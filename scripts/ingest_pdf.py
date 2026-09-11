@@ -1,14 +1,15 @@
 from pathlib import Path
 
 from medintel.embedding.service import EmbeddingService
+from medintel.ingestion.chunk_store import save_chunks
 from medintel.ingestion.langchain_chunker import (
     chunk_document_with_langchain,
 )
 from medintel.ingestion.pdf_parser import parse_pdf_file
 from medintel.vectorstore.qdrant import QdrantVectorStore
 
-
 FILE_PATH = Path("data/documents/has/bon_usage_antiemetiques.pdf")
+CHUNKS_PATH = Path("data/processed/chunks.jsonl")
 
 TITLE = (
     "Bon usage des médicaments antiémétiques dans le traitement "
@@ -31,6 +32,9 @@ def main() -> None:
 
     print(f"Documents: {len(documents)}")
     print(f"Chunks: {len(chunks)}")
+
+    save_chunks(chunks, CHUNKS_PATH)
+    print(f"Chunks saved to: {CHUNKS_PATH}")
 
     embedding_service = EmbeddingService()
 

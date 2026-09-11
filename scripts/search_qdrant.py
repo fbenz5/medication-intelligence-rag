@@ -1,7 +1,6 @@
 from medintel.embedding.service import EmbeddingService
 from medintel.vectorstore.qdrant import QdrantVectorStore
 
-
 QUERY = "What medications are recommended for nausea and vomiting?"
 
 
