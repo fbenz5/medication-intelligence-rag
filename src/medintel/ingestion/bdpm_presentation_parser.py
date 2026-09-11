@@ -1,6 +1,6 @@
 import csv
 from datetime import date, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from medintel.ingestion.models import IngestionError, IngestionResult
@@ -25,7 +25,10 @@ def parse_decimal(value: str) -> Decimal | None:
     if not value:
         return None
 
-    return Decimal(value)
+    try:
+        return Decimal(value)
+    except InvalidOperation:
+        return None
 
 
 def parse_presentation_row(row: list[str]) -> Presentation:
@@ -65,18 +68,18 @@ def parse_bdpm_presentation_file(file_path: Path) -> IngestionResult:
         for row_number, row in enumerate(reader, start=1):
             try:
                 presentations.append(parse_presentation_row(row))
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as error:
                 errors.append(
                     IngestionError(
                         row_number=row_number,
-                        error="Invalid presentation row",
+                        error=str(error),
                     )
                 )
 
     return IngestionResult(
-            items=presentations,
-            total_rows=len(presentations) + len(errors),
-            successful_rows=len(presentations),
-            failed_rows=len(errors),
-            errors=errors,
-        )
+        items=presentations,
+        total_rows=len(presentations) + len(errors),
+        successful_rows=len(presentations),
+        failed_rows=len(errors),
+        errors=errors,
+    )
