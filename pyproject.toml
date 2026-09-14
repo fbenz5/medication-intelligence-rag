@@ -7,7 +7,7 @@ name = "medication-intelligence-rag"
 version = "0.1.0"
 description = "Production-grade RAG platform for evidence-grounded medication information."
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = ["openai>=1.0.0",]
 
 [tool.setuptools.packages.find]
 where = ["src"]
