@@ -11,6 +11,7 @@ dependencies = [
     "openai>=1.0.0",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
+    "pydantic-settings>=2.0",
 ]
 
 [tool.setuptools.packages.find]
@@ -24,10 +25,4 @@ line-length = 100
 target-version = "py312"
 
 [tool.ruff.lint]
-select = [
-    "E",
-    "F",
-    "I",
-    "B",
-    "UP",
-]
+select = ["E", "F", "I", "B", "UP"]

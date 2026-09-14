@@ -1,8 +1,7 @@
-import os
-
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
+from medintel.config import settings
 from medintel.generation.context import EvidenceContext
 from medintel.generation.prompt import SYSTEM_PROMPT, build_prompt
 
@@ -17,10 +16,10 @@ class LLMGenerator:
     def __init__(
         self,
         client: OpenAI | None = None,
-        model: str = "gpt-5.6-terra",
+        model: str | None = None,
     ) -> None:
-        self.client = client or OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-        self.model = model
+        self.client = client or OpenAI(api_key=settings.openai_api_key)
+        self.model = model or settings.openai_model
 
     def generate(self, context: EvidenceContext) -> GeneratedAnswer:
         response = self.client.responses.parse(

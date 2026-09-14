@@ -1,5 +1,4 @@
-from pathlib import Path
-
+from medintel.config import settings
 from medintel.generation.context import EvidenceContextBuilder
 from medintel.generation.llm import LLMGenerator
 from medintel.generation.service import GenerationService
@@ -12,18 +11,15 @@ from medintel.structured.composition_loader import load_composition_repository
 from medintel.structured.loader import load_medication_repository
 from medintel.structured.presentation_loader import load_presentation_repository
 
-PROCESSED_DATA_PATH = Path("data/processed")
-
 
 def build_generation_service() -> GenerationService:
-    chunks = load_chunks(PROCESSED_DATA_PATH / "chunks.jsonl")
+    chunks = load_chunks(settings.processed_data_path / "chunks.jsonl")
 
     medication_repository = load_medication_repository()
     presentation_repository = load_presentation_repository()
     composition_repository = load_composition_repository()
 
     query_router = QueryRouter()
-
     query_parser = QueryParser(
         router=query_router,
         repository=medication_repository,

@@ -1,15 +1,13 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct
 
+from medintel.config import settings
 from medintel.models.chunk import Chunk
-
-QDRANT_URL = "http://localhost:6333"
-COLLECTION_NAME = "medication_documents"
 
 
 class QdrantVectorStore:
     def __init__(self) -> None:
-        self.client = QdrantClient(url=QDRANT_URL)
+        self.client = QdrantClient(url=settings.qdrant_url)
 
     def upsert_chunks(
         self,
@@ -40,7 +38,7 @@ class QdrantVectorStore:
         ]
 
         self.client.upsert(
-            collection_name=COLLECTION_NAME,
+            collection_name=settings.qdrant_collection,
             points=points,
         )
 
@@ -50,7 +48,7 @@ class QdrantVectorStore:
         limit: int = 5,
     ) -> list:
         return self.client.query_points(
-            collection_name=COLLECTION_NAME,
+            collection_name=settings.qdrant_collection,
             query=query_vector,
             limit=limit,
             with_payload=True,
