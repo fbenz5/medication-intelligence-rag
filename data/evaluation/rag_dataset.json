@@ -1,0 +1,29 @@
+[
+  {
+    "user_input": "What are the cardiac risks associated with antiemetic medications?",
+    "reference": "Dompéridone and metoclopramide are associated with serious cardiac adverse effects including severe ventricular arrhythmias and sudden cardiac death related to QT interval prolongation. For dompéridone, risk factors include hypokalemia, bradycardia, overdose, concomitant medicines that prolong the QT interval, and advanced age. The available evidence does not establish that métopimazine carries the same increased risk of serious cardiac rhythm disorders or sudden cardiac death.",
+    "reference_contexts": [
+      "Les médicaments à base de dompéridone, métoclopramide ou métopimazine ont une place restreinte dans la stratégie thérapeutique. Compte tenu du risque d’effets indésirables cardiaques graves (arythmies ventriculaires, morts subites cardiaques), la prescription d’un antiémétique devrait être envisagée uniquement lorsque des vomissements peuvent entraîner à court terme des complications graves ou très gênantes.",
+      "Le métoclopramide peut provoquer des effets indésirables cardiaques : arythmies ventriculaires graves et morts subites cardiaques du fait de l’allongement de l’intervalle QT. Les données disponibles ne permettent pas de quantifier l’importance de l’excès de risque.",
+      "La dompéridone expose les patients à des arythmies ventriculaires graves et une mort subite cardiaque du fait de l’allongement de l’intervalle QT et à des effets indésirables neurologiques rares. Il convient de prendre en compte les facteurs de risque tels que : hypokaliémie, bradycardie, surdosage, autres médicaments allongeant l’intervalle QT, âge avancé.",
+      "Il n’est pas établi que la métopimazine expose les patients à un risque accru de troubles du rythme cardiaque graves ou de morts subites, comme la dompéridone et le métoclopramide."
+    ]
+  },
+  {
+    "user_input": "What are the main neurological and cardiac adverse effects associated with metoclopramide?",
+    "reference": "Metoclopramide can cause serious neurological adverse effects, particularly acute extrapyramidal symptoms and tardive dyskinesia. Serious cardiac adverse effects include ventricular arrhythmias and sudden cardiac death associated with QT interval prolongation.",
+    "reference_contexts": [
+      "Le métoclopramide peut provoquer des effets indésirables graves, principalement neurologiques. Il s’agit notamment de symptômes extrapyramidaux périphériques et de dyskinésie tardive.",
+      "Des effets indésirables cardiaques sont aussi observés : arythmies ventriculaires graves et morts subites cardiaques du fait de l’allongement de l’intervalle QT.",
+      "Troubles neurologiques (symptômes extrapyramidaux aigus et dyskinésie tardive), arythmies ventriculaires graves, torsades de pointes, mort subite cardiaque par allongement de l’intervalle QTc."
+    ]
+  },
+  {
+    "user_input": "What adverse effects are specifically associated with domperidone?",
+    "reference": "Dompéridone is associated with neurological adverse effects and serious cardiac effects including severe ventricular arrhythmias, torsades de pointes, and sudden cardiac death due to QTc prolongation.",
+    "reference_contexts": [
+      "La dompéridone expose les patients à des arythmies ventriculaires graves et une mort subite cardiaque du fait de l’allongement de l’intervalle QT et à des effets indésirables neurologiques rares.",
+      "Troubles neurologiques, arythmies ventriculaires graves, torsades de pointes, mort subite cardiaque par allongement de l’intervalle QTc."
+    ]
+  }
+]
