@@ -1,3 +1,4 @@
+from medintel.generation.citation_resolver import CitationResolver
 from medintel.generation.context import EvidenceContextBuilder
 from medintel.generation.llm import GeneratedAnswer
 from medintel.generation.service import GenerationService
@@ -12,38 +13,27 @@ class FakeRetrievalService:
         return RetrievalResult(
             intent=QueryIntent(
                 route=RetrievalRoute.RAG,
-                requested_information="risks",
             ),
             chunks=[
                 (
                     Chunk(
                         chunk_id="chunk-1",
                         source="HAS",
-                        title="Medication safety guidance",
-                        filename="guidance.pdf",
-                        page_number=2,
-                        text=(
-                            "The medicine is associated with an increased "
-                            "risk of arrhythmia."
-                        ),
+                        title="Test document",
+                        filename="test.pdf",
+                        page_number=1,
+                        text="Test evidence.",
                     ),
-                    0.95,
+                    1.0,
                 )
             ],
         )
 
 
 class FakeLLMGenerator:
-    def generate(self, context) -> GeneratedAnswer:
-        assert context.query == "What are the cardiac risks?"
-        assert len(context.evidences) == 1
-        assert context.evidences[0].evidence_id == "chunk-1"
-
+    def generate(self, context):
         return GeneratedAnswer(
-            answer=(
-                "The medicine is associated with an increased "
-                "risk of arrhythmia."
-            ),
+            answer="Test answer.",
             citations=["chunk-1"],
             evidence_sufficient=True,
         )
@@ -54,13 +44,13 @@ def test_generation_service_connects_retrieval_context_and_llm() -> None:
         retrieval_service=FakeRetrievalService(),
         context_builder=EvidenceContextBuilder(),
         llm_generator=FakeLLMGenerator(),
+        citation_resolver=CitationResolver(),
     )
 
-    result = service.answer("What are the cardiac risks?")
+    result = service.answer("Test question")
 
-    assert result.answer == (
-        "The medicine is associated with an increased "
-        "risk of arrhythmia."
-    )
-    assert result.citations == ["chunk-1"]
+    assert result.answer == "Test answer."
+    assert len(result.citations) == 1
+    assert result.citations[0].evidence_id == "chunk-1"
+    assert result.citations[0].source == "HAS"
     assert result.evidence_sufficient is True

@@ -1,4 +1,5 @@
 from medintel.config import settings
+from medintel.generation.citation_resolver import CitationResolver
 from medintel.generation.context import EvidenceContextBuilder
 from medintel.generation.llm import LLMGenerator
 from medintel.generation.service import GenerationService
@@ -20,6 +21,7 @@ def build_generation_service() -> GenerationService:
     composition_repository = load_composition_repository()
 
     query_router = QueryRouter()
+
     query_parser = QueryParser(
         router=query_router,
         repository=medication_repository,
@@ -37,9 +39,11 @@ def build_generation_service() -> GenerationService:
 
     context_builder = EvidenceContextBuilder()
     llm_generator = LLMGenerator()
+    citation_resolver = CitationResolver()
 
     return GenerationService(
         retrieval_service=retrieval_service,
         context_builder=context_builder,
         llm_generator=llm_generator,
+        citation_resolver=citation_resolver,
     )

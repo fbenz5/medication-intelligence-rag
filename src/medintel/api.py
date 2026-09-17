@@ -4,8 +4,8 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 
 from medintel.app import build_generation_service
-from medintel.generation.llm import GeneratedAnswer
-from medintel.generation.service import GenerationService
+from medintel.generation.citation import Citation
+from medintel.generation.service import GeneratedResponse, GenerationService
 
 
 class AskRequest(BaseModel):
@@ -14,7 +14,7 @@ class AskRequest(BaseModel):
 
 class AskResponse(BaseModel):
     answer: str
-    citations: list[str]
+    citations: list[Citation]
     evidence_sufficient: bool
 
 
@@ -41,7 +41,7 @@ def health() -> dict[str, str]:
 def ask(request: Request, payload: AskRequest) -> AskResponse:
     generation_service: GenerationService = request.app.state.generation_service
 
-    result: GeneratedAnswer = generation_service.answer(payload.query)
+    result: GeneratedResponse = generation_service.answer(payload.query)
 
     return AskResponse(
         answer=result.answer,
