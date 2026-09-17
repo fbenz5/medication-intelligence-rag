@@ -17,22 +17,26 @@ class CitationResolver:
             for evidence in context.evidences
         }
 
+        normalized_ids = [
+            evidence_id.strip().strip("[]")
+            for evidence_id in evidence_ids
+        ]
+
         invalid_ids = [
             evidence_id
-            for evidence_id in evidence_ids
+            for evidence_id in normalized_ids
             if evidence_id not in evidence_by_id
         ]
 
         if invalid_ids:
             invalid_ids = list(dict.fromkeys(invalid_ids))
-
             raise CitationValidationError(
                 f"Answer contains invalid evidence citations: {invalid_ids}"
             )
 
         citations: list[Citation] = []
 
-        for evidence_id in dict.fromkeys(evidence_ids):
+        for evidence_id in dict.fromkeys(normalized_ids):
             evidence = evidence_by_id[evidence_id]
 
             citations.append(

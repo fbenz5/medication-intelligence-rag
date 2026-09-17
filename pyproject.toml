@@ -18,6 +18,8 @@ dependencies = [
     "langchain-community==0.3.31",
     "langchain-openai==0.3.35",
     "instructor<1.10",
+    "streamlit>=1.40",
+    "requests>=2.32",
 ]
 
 [tool.setuptools.packages.find]

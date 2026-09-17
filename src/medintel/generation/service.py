@@ -1,3 +1,5 @@
+import re
+
 from pydantic import BaseModel, Field
 
 from medintel.generation.citation import Citation
@@ -43,8 +45,38 @@ class GenerationService:
             context=evidence_context,
         )
 
-        return GeneratedResponse(
+        citation_numbers = {
+            citation.evidence_id: index
+            for index, citation in enumerate(citations, start=1)
+        }
+
+        answer = self._replace_citation_ids(
             answer=generated_answer.answer,
+            citation_numbers=citation_numbers,
+        )
+
+        return GeneratedResponse(
+            answer=answer,
             citations=citations,
             evidence_sufficient=generated_answer.evidence_sufficient,
+        )
+
+    @staticmethod
+    def _replace_citation_ids(
+        answer: str,
+        citation_numbers: dict[str, int],
+    ) -> str:
+        def replace(match: re.Match[str]) -> str:
+            evidence_id = match.group(1)
+            number = citation_numbers.get(evidence_id)
+
+            if number is None:
+                return match.group(0)
+
+            return f"[{number}]"
+
+        return re.sub(
+            r"\[([^\]]+)\]",
+            replace,
+            answer,
         )
