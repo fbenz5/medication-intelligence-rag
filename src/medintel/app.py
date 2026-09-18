@@ -14,14 +14,15 @@ from medintel.structured.presentation_loader import load_presentation_repository
 
 
 def build_generation_service() -> GenerationService:
-    chunks = load_chunks(settings.processed_data_path / "chunks.jsonl")
+    chunks = load_chunks(
+        settings.data_processed_path / "chunks.jsonl"
+    )
 
     medication_repository = load_medication_repository()
     presentation_repository = load_presentation_repository()
     composition_repository = load_composition_repository()
 
     query_router = QueryRouter()
-
     query_parser = QueryParser(
         router=query_router,
         repository=medication_repository,

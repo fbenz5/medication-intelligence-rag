@@ -1,14 +1,11 @@
-from pathlib import Path
-
+from medintel.config import settings
 from medintel.ingestion.bdpm_parser import parse_bdpm_file
 from medintel.structured.repository import MedicationRepository
-
-RAW_DATA_PATH = Path("data/raw")
 
 
 def load_medication_repository() -> MedicationRepository:
     result = parse_bdpm_file(
-        RAW_DATA_PATH / "CIS_bdpm.txt"
+        settings.data_raw_path / "CIS_bdpm.txt"
     )
 
     return MedicationRepository(
