@@ -1,13 +1,32 @@
 from qdrant_client import QdrantClient
-from qdrant_client.models import PointStruct
+from qdrant_client.models import Distance, PointStruct, VectorParams
 
 from medintel.config import settings
 from medintel.models.chunk import Chunk
 
 
 class QdrantVectorStore:
+    VECTOR_SIZE = 1024
+
     def __init__(self) -> None:
         self.client = QdrantClient(url=settings.qdrant_url)
+
+    def create_collection(self) -> None:
+        collections = self.client.get_collections().collections
+
+        if any(
+            collection.name == settings.qdrant_collection
+            for collection in collections
+        ):
+            return
+
+        self.client.create_collection(
+            collection_name=settings.qdrant_collection,
+            vectors_config=VectorParams(
+                size=self.VECTOR_SIZE,
+                distance=Distance.COSINE,
+            ),
+        )
 
     def upsert_chunks(
         self,

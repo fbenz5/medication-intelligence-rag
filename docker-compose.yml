@@ -1,0 +1,45 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medication-api
+    env_file:
+      - .env
+    environment:
+      QDRANT_URL: http://qdrant:6333
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      - qdrant
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medication-streamlit
+    env_file:
+      - .env
+    environment:
+      API_URL: http://api:8000
+    command: >
+      streamlit run src/medintel/ui.py
+      --server.address=0.0.0.0
+      --server.port=8501
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: medication-qdrant
+    volumes:
+      - qdrant_data:/qdrant/storage
+    ports:
+      - "6333:6333"
+
+volumes:
+  qdrant_data:
