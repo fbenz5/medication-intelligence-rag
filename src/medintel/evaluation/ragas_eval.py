@@ -1,4 +1,5 @@
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -97,13 +98,14 @@ def main() -> None:
     print("\nQuality gate:")
 
     quality_gate_passed = True
+    evaluation_completed = True
 
     for metric_name, threshold in QUALITY_THRESHOLDS.items():
         score = scores.get(metric_name)
 
-        if score is None:
-            print(f"- {metric_name}: MISSING")
-            quality_gate_passed = False
+        if score is None or math.isnan(score):
+            print(f"- {metric_name}: NO VALID SCORE → EVALUATION FAILED")
+            evaluation_completed = False
             continue
 
         status = "PASS" if score >= threshold else "FAIL"
@@ -115,6 +117,10 @@ def main() -> None:
 
         if score < threshold:
             quality_gate_passed = False
+
+    if not evaluation_completed:
+        print("\nQUALITY GATE: EVALUATION FAILED")
+        sys.exit(2)
 
     if quality_gate_passed:
         print("\nQUALITY GATE: PASSED")
