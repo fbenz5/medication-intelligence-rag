@@ -12,9 +12,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      qdrant:
+        image: qdrant/qdrant:latest
+        ports:
+          - 6333:6333
+
     env:
       OPENAI_API_KEY: test-key
-      
+      QDRANT_URL: http://localhost:6333
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,3 +41,16 @@ jobs:
 
       - name: Run tests
         run: pytest
+
+      - name: Create Qdrant collection
+        run: python scripts/create_qdrant_collection.py
+
+      - name: Ingest evaluation corpus
+        run: python scripts/ingest_pdf.py
+
+      - name: Run RAG evaluation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python -m medintel.evaluation.runner
+          python -m medintel.evaluation.ragas_eval
