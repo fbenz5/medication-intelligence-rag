@@ -1,8 +1,10 @@
 import json
+import sys
 from pathlib import Path
 
 from langchain_openai import ChatOpenAI
 from ragas import EvaluationDataset, evaluate
+from ragas.embeddings import LangchainEmbeddingsWrapper
 from ragas.llms import LangchainLLMWrapper
 from ragas.metrics import (
     Faithfulness,
@@ -12,8 +14,16 @@ from ragas.metrics import (
 )
 
 from medintel.config import settings
+from medintel.embedding.service import EmbeddingService
 
 RESULTS_PATH = Path("data/evaluation/rag_results.json")
+
+QUALITY_THRESHOLDS = {
+    "llm_context_precision_without_reference": 0.90,
+    "context_recall": 0.85,
+    "faithfulness": 0.90,
+    "answer_relevancy": 0.90,
+}
 
 
 def load_results() -> list[dict]:
@@ -44,7 +54,13 @@ def main() -> None:
     evaluator_llm = LangchainLLMWrapper(
         ChatOpenAI(
             model=settings.eval_model,
+            api_key=settings.openai_api_key,
         )
+    )
+
+    embedding_service = EmbeddingService()
+    evaluator_embeddings = LangchainEmbeddingsWrapper(
+        embedding_service._embeddings,
     )
 
     metrics = [
@@ -65,10 +81,47 @@ def main() -> None:
         dataset=dataset,
         metrics=metrics,
         llm=evaluator_llm,
+        embeddings=evaluator_embeddings,
     )
 
     print("\nEvaluation results:")
     print(evaluation_result)
+
+    scores = (
+        evaluation_result
+        .to_pandas()
+        .mean(numeric_only=True)
+        .to_dict()
+    )
+
+    print("\nQuality gate:")
+
+    quality_gate_passed = True
+
+    for metric_name, threshold in QUALITY_THRESHOLDS.items():
+        score = scores.get(metric_name)
+
+        if score is None:
+            print(f"- {metric_name}: MISSING")
+            quality_gate_passed = False
+            continue
+
+        status = "PASS" if score >= threshold else "FAIL"
+
+        print(
+            f"- {metric_name}: "
+            f"{score:.4f} >= {threshold:.2f} → {status}"
+        )
+
+        if score < threshold:
+            quality_gate_passed = False
+
+    if quality_gate_passed:
+        print("\nQUALITY GATE: PASSED")
+        return
+
+    print("\nQUALITY GATE: FAILED")
+    sys.exit(1)
 
 
 if __name__ == "__main__":
