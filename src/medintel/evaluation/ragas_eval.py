@@ -13,6 +13,7 @@ from ragas.metrics import (
     LLMContextRecall,
     ResponseRelevancy,
 )
+from ragas.run_config import RunConfig
 
 from medintel.config import settings
 from medintel.embedding.service import EmbeddingService
@@ -83,8 +84,13 @@ def main() -> None:
         metrics=metrics,
         llm=evaluator_llm,
         embeddings=evaluator_embeddings,
+        run_config=RunConfig(
+            timeout=600,
+            max_retries=3,
+            max_wait=30,
+            max_workers=2,
+        ),
     )
-
     print("\nEvaluation results:")
     print(evaluation_result)
 
