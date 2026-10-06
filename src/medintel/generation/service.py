@@ -1,4 +1,6 @@
+import logging
 import re
+import time
 
 from pydantic import BaseModel, Field
 
@@ -7,6 +9,8 @@ from medintel.generation.citation_resolver import CitationResolver
 from medintel.generation.context import EvidenceContextBuilder
 from medintel.generation.llm import GeneratedAnswer, LLMGenerator
 from medintel.routing.retrieval import RetrievalService
+
+logger = logging.getLogger("medintel.generation")
 
 
 class GeneratedResponse(BaseModel):
@@ -29,20 +33,74 @@ class GenerationService:
         self.citation_resolver = citation_resolver
 
     def answer(self, query: str) -> GeneratedResponse:
+        retrieval_start = time.perf_counter()
+
         retrieval_result = self.retrieval_service.retrieve(query)
+
+        retrieval_latency_ms = (
+            time.perf_counter() - retrieval_start
+        ) * 1000
+
+        logger.info(
+            "retrieval_completed",
+            extra={
+                "latency_ms": round(retrieval_latency_ms, 2),
+                "chunks_retrieved": len(retrieval_result.chunks),
+            },
+        )
+
+        context_start = time.perf_counter()
 
         evidence_context = self.context_builder.build(
             query=query,
             result=retrieval_result,
         )
 
+        context_latency_ms = (
+            time.perf_counter() - context_start
+        ) * 1000
+
+        logger.info(
+            "context_build_completed",
+            extra={
+                "latency_ms": round(context_latency_ms, 2),
+            },
+        )
+
+        generation_start = time.perf_counter()
+
         generated_answer: GeneratedAnswer = self.llm_generator.generate(
             evidence_context
         )
 
+        generation_latency_ms = (
+            time.perf_counter() - generation_start
+        ) * 1000
+
+        logger.info(
+            "llm_generation_completed",
+            extra={
+                "latency_ms": round(generation_latency_ms, 2),
+            },
+        )
+
+        citation_start = time.perf_counter()
+
         citations = self.citation_resolver.resolve(
             evidence_ids=generated_answer.citations,
             context=evidence_context,
+        )
+
+        citation_latency_ms = (
+            time.perf_counter() - citation_start
+        ) * 1000
+
+        logger.info(
+            "citation_resolution_completed",
+            extra={
+                "latency_ms": round(citation_latency_ms, 2),
+                "citations_resolved": len(citations),
+            },
         )
 
         citation_numbers = {
