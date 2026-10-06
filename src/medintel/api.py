@@ -4,11 +4,13 @@ import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel, Field
 
 from medintel.app import build_generation_service
 from medintel.generation.citation import Citation
 from medintel.generation.service import GeneratedResponse, GenerationService
+from medintel.observability.metrics import REQUEST_COUNT, REQUEST_ERRORS
 
 logger = logging.getLogger("medintel.api")
 
@@ -36,20 +38,23 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+
 
 @app.middleware("http")
 async def request_logging_middleware(request: Request, call_next):
     request_id = str(uuid.uuid4())
     start_time = time.perf_counter()
-
     response = None
+
+    REQUEST_COUNT.inc()
 
     try:
         response = await call_next(request)
-
         return response
-
     except Exception:
+        REQUEST_ERRORS.inc()
+
         logger.exception(
             "request_failed",
             extra={
@@ -59,7 +64,6 @@ async def request_logging_middleware(request: Request, call_next):
             },
         )
         raise
-
     finally:
         latency_ms = (time.perf_counter() - start_time) * 1000
 

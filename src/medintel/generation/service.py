@@ -8,6 +8,10 @@ from medintel.generation.citation import Citation
 from medintel.generation.citation_resolver import CitationResolver
 from medintel.generation.context import EvidenceContextBuilder
 from medintel.generation.llm import GeneratedAnswer, LLMGenerator
+from medintel.observability.metrics import (
+    RETRIEVAL_LATENCY,
+    RETRIEVED_CHUNKS,
+)
 from medintel.routing.retrieval import RetrievalService
 
 logger = logging.getLogger("medintel.generation")
@@ -40,6 +44,9 @@ class GenerationService:
         retrieval_latency_ms = (
             time.perf_counter() - retrieval_start
         ) * 1000
+
+        RETRIEVAL_LATENCY.observe(retrieval_latency_ms / 1000)
+        RETRIEVED_CHUNKS.observe(len(retrieval_result.chunks))
 
         logger.info(
             "retrieval_completed",

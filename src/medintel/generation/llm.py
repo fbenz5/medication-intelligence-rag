@@ -7,6 +7,12 @@ from pydantic import BaseModel, Field
 from medintel.config import settings
 from medintel.generation.context import EvidenceContext
 from medintel.generation.prompt import SYSTEM_PROMPT, build_prompt
+from medintel.observability.metrics import (
+    LLM_COST,
+    LLM_INPUT_TOKENS,
+    LLM_LATENCY,
+    LLM_OUTPUT_TOKENS,
+)
 
 logger = logging.getLogger("medintel.llm")
 
@@ -54,6 +60,8 @@ class LLMGenerator:
 
         latency_ms = (time.perf_counter() - start_time) * 1000
 
+        LLM_LATENCY.observe(latency_ms / 1000)
+
         if response.output_parsed is None:
             logger.error(
                 "llm_generation_failed",
@@ -66,9 +74,17 @@ class LLMGenerator:
 
         usage = response.usage
 
-        input_tokens = usage.input_tokens if usage else 0
-        output_tokens = usage.output_tokens if usage else 0
-        total_tokens = usage.total_tokens if usage else 0
+        input_tokens = (
+            usage.input_tokens
+            if usage and isinstance(usage.input_tokens, int)
+            else 0
+        )
+        output_tokens = (
+            usage.output_tokens
+            if usage and isinstance(usage.output_tokens, int)
+            else 0
+        )
+        total_tokens = input_tokens + output_tokens
 
         pricing = MODEL_PRICING_USD_PER_1M_TOKENS.get(self.model)
 
@@ -80,6 +96,12 @@ class LLMGenerator:
                 + output_tokens / 1_000_000 * pricing["output"]
             )
 
+        LLM_INPUT_TOKENS.inc(input_tokens)
+        LLM_OUTPUT_TOKENS.inc(output_tokens)
+
+        if cost_usd is not None:
+            LLM_COST.inc(cost_usd)
+
         logger.info(
             "llm_generation_completed",
             extra={
@@ -88,7 +110,11 @@ class LLMGenerator:
                 "input_tokens": input_tokens,
                 "output_tokens": output_tokens,
                 "total_tokens": total_tokens,
-                "cost_usd": round(cost_usd, 6) if cost_usd is not None else None,
+                "cost_usd": (
+                    round(cost_usd, 6)
+                    if cost_usd is not None
+                    else None
+                ),
             },
         )
 
