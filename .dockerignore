@@ -8,6 +8,8 @@ __pycache__
 .env
 .env.*
 !.env.example
-data/
+data/*
+!data/processed/
+!data/processed/chunks.jsonl
 qdrant_data/
 .pytest_cache/
