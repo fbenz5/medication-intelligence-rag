@@ -2,7 +2,7 @@ from FlagEmbedding import FlagReranker
 
 from medintel.models.chunk import Chunk
 
-MODEL_NAME = "BAAI/bge-reranker-v2-m3"
+MODEL_NAME = "BAAI/bge-reranker-base"
 
 
 class Reranker:

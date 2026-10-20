@@ -8,6 +8,9 @@ ENV PYTHONUNBUFFERED=1
 COPY pyproject.toml .
 COPY src ./src
 COPY data/processed/chunks.jsonl ./data/processed/chunks.jsonl
+COPY data/raw/CIS_bdpm.txt ./data/raw/CIS_bdpm.txt
+COPY data/raw/CIS_CIP_bdpm.txt ./data/raw/CIS_CIP_bdpm.txt
+COPY data/raw/CIS_COMPO_bdpm.txt ./data/raw/CIS_COMPO_bdpm.txt
 
 RUN pip install --no-cache-dir -e .
 

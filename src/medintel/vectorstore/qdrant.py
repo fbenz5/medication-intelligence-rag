@@ -9,7 +9,10 @@ class QdrantVectorStore:
     VECTOR_SIZE = 1024
 
     def __init__(self) -> None:
-        self.client = QdrantClient(url=settings.qdrant_url)
+        self.client = QdrantClient(
+                        url=settings.qdrant_url,
+                        api_key=settings.qdrant_api_key,
+                    )
 
     def create_collection(self) -> None:
         collections = self.client.get_collections().collections
